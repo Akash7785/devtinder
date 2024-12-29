@@ -1,11 +1,16 @@
 const express = require("express");
 const connectDB = require("./config/database");
-const User = require("./model/user.model");
 const app = express();
+const User = require("./model/user.model");
+const { validateSignUpData } = require("./utils/validation");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const cookieparser = require("cookie-parser");
 const adminAuth = require("./middleware/auth");
+const userAuth = require("./middleware/auth");
 
 app.use(express.json());
+app.use(cookieparser());
 
 app.get("/", (req, res) => {
   res.send("Home Page");
@@ -19,9 +24,15 @@ app.post("/admin/dashboard", (req, res) => {
 });
 
 // REGISTER A NEW USER
-app.post("/signup", (req, res) => {
-  const { firstName, lastName, email, password, age } = req.body;
+app.post("/signup", async (req, res) => {
   try {
+    // validateSignUpData(req);
+    const { firstName, lastName, email, password, age } = req.body;
+    const user = await User.findOne({ email: email });
+    if (user) {
+      throw new Error("User already exists");
+    }
+
     bcrypt.hash(password, 10, async function (err, hashPassword) {
       if (err) {
         throw new Error("Can not hash password");
@@ -43,30 +54,28 @@ app.post("/signup", (req, res) => {
 
 // LOGIN A USER
 app.post("/login", async (req, res) => {
-  const { email, password } = req?.body;
   try {
-    const user = await User.find({ email: email });
-    if (user.length === 0) {
-      throw new Error("Either email or password is incorrect");
+    const { email, password } = req?.body;
+    const user = await User.findOne({ email: email });
+    if (!user) {
+      throw new Error("Invalid credentials");
     }
-    if (user[0]?.password !== password) {
-      bcrypt.compare(password, user[0]?.password, function (err, result) {
-        if (err) {
-          throw new Error("Either email or password is incorrect");
-        }
-        if (!result) {
-          throw new Error("Either email or password is incorrect");
-        }
-      });
+    const isPasswordValid = await user.validatepassword(password);
+    if (isPasswordValid) {
+      // CREATING A COOKIE & JWT TOKEN FOR AUTHENTICATION
+      const token = user.getJWT();
+      res.cookie("token", token);
+      res.status(200).send("Login successful");
+    } else {
+      throw new Error("Invalid credentials");
     }
-    res.status(200).send("User logged in successfully");
   } catch (error) {
     res.status(400).send("Can not login user " + error.message);
   }
 });
 
 // GET ALL USERS
-app.get("/feed", async (req, res) => {
+app.get("/feed", userAuth, async (req, res) => {
   try {
     const users = await User.find();
     res.status(200).send(users);
@@ -123,6 +132,19 @@ app.delete("/user/:id", async (req, res) => {
   } catch (error) {
     res.status(400).send("Can not delete user" + error.message);
   }
+});
+
+app.get("/profile", userAuth, async (req, res) => {
+  try {
+    const user = req.user;
+    res.status(200).send(user);
+  } catch (error) {
+    res.status(400).send("Can not get profile" + error.message);
+  }
+});
+
+app.use("/", (req, res) => {
+  res.send("404 Page not found");
 });
 
 //To connect to the database
