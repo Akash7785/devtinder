@@ -11,10 +11,12 @@ app.use(cookieparser());
 const authRouter = require("./routes/auth.route");
 const profileRoutes = require("./routes/profile.route");
 const userRoutes = require("./routes/user.route");
+const connectionRoute = require("./routes/connection.route");
 
 app.use("/", authRouter);
+app.use("/", userAuth, connectionRoute);
+app.use("/", userAuth, userRoutes);
 app.use("/", userAuth, profileRoutes);
-app.use("/", userRoutes);
 
 app.use("/", (req, res) => {
   res.send("404 Page not found");
