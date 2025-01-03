@@ -44,4 +44,31 @@ connectionRoute.post("/request/send/:status/:userId", async (req, res) => {
   }
 });
 
+// REVIEW CONNECTION REQUEST (ACCEPT OR REJECT CONNECTION REQUEST)
+
+connectionRoute.post("/request/review/:status/:requestId", async (req, res) => {
+  try {
+    const loggedInUser = req.user._id;
+    const { status, requestId } = req.params;
+
+    const allowedStatus = ["accepted", "rejected"];
+    if (!allowedStatus.includes(status)) {
+      throw new Error("Invalid status");
+    }
+    const connectionRequestData = await connectionRequest.findOne({
+      status: "interested",
+      toUserId: loggedInUser,
+      _id: requestId,
+    });
+    if (!connectionRequestData) {
+      throw new Error("No new connection request");
+    }
+    connectionRequestData.status = status;
+    const data = await connectionRequestData.save();
+    res.status(200).json({ message: "Connection request " + status, data });
+  } catch (error) {
+    res.status(400).send("Error! " + error.message);
+  }
+});
+
 module.exports = connectionRoute;
