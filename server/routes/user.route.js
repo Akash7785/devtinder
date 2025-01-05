@@ -48,7 +48,7 @@ userRouter.get("/user/connection", async (req, res) => {
         { fromUserId: loggedInUser, status: "accepted" },
       ],
     })
-    .populate("fromUserId toUserId", USER_SAFE_DATA);
+    .populate("fromUserId", USER_SAFE_DATA);
   res.send(connections);
 });
 
