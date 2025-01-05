@@ -61,7 +61,7 @@ connectionRoute.post("/request/review/:status/:requestId", async (req, res) => {
       _id: requestId,
     });
     if (!connectionRequestData) {
-      throw new Error("No new connection request");
+      throw new Error("No new connection requesst");
     }
     connectionRequestData.status = status;
     const data = await connectionRequestData.save();
