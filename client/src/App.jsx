@@ -1,7 +1,20 @@
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Feed from "./components/Feed";
+import Register from "./components/Register";
+import Login from "./components/Login";
+import Body from "./components/Body";
 function App() {
   return (
     <>
-      <h1 className="text-3xl font-bold underline">Hello world!</h1>
+      <BrowserRouter basename="/">
+        <Routes>
+          <Route path="/" element={<Body />}>
+            <Route path="/" element={<Feed />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<Login />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
     </>
   );
 }
