@@ -1,62 +1,85 @@
-import React from "react";
+import React, { useState } from "react";
+import { MdEmail } from "react-icons/md";
+import { FaKey } from "react-icons/fa6";
+import { FaEyeSlash } from "react-icons/fa";
+import { FaRegEye } from "react-icons/fa";
+import axios from "axios";
+import { BASE_URL } from "../utils/constant";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState("password");
+  const navigate = useNavigate();
+
+  const handleHidePassword = () => {
+    if (showPassword === "password") {
+      setShowPassword("text");
+    }
+    if (showPassword === "text") {
+      setShowPassword("password");
+    }
+  };
+
+  const handleLogin = async () => {
+    try {
+      const res = await axios.post(
+        BASE_URL + "/login",
+        {
+          email,
+          password,
+        },
+        { withCredentials: true }
+      );
+      console.log(res);
+      // dispatch(addUser(res.data));
+      return navigate("/");
+    } catch (err) {
+      // setError(err?.response?.data || "Something went wrong");
+      console.log(err);
+    }
+  };
+
   return (
-    <>
-      <label className="input input-bordered flex items-center gap-2">
-        <input type="text" className="grow" placeholder="Search" />
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 16 16"
-          fill="currentColor"
-          className="h-4 w-4 opacity-70"
-        >
-          <path
-            fillRule="evenodd"
-            d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
-            clipRule="evenodd"
-          />
-        </svg>
-      </label>
-      <label className="input input-bordered flex items-center gap-2">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 16 16"
-          fill="currentColor"
-          className="h-4 w-4 opacity-70"
-        >
-          <path d="M2.5 3A1.5 1.5 0 0 0 1 4.5v.793c.026.009.051.02.076.032L7.674 8.51c.206.1.446.1.652 0l6.598-3.185A.755.755 0 0 1 15 5.293V4.5A1.5 1.5 0 0 0 13.5 3h-11Z" />
-          <path d="M15 6.954 8.978 9.86a2.25 2.25 0 0 1-1.956 0L1 6.954V11.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V6.954Z" />
-        </svg>
-        <input type="text" className="grow" placeholder="Email" />
-      </label>
-      <label className="input input-bordered flex items-center gap-2">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 16 16"
-          fill="currentColor"
-          className="h-4 w-4 opacity-70"
-        >
-          <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM12.735 14c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139h9.47Z" />
-        </svg>
-        <input type="text" className="grow" placeholder="Username" />
-      </label>
-      <label className="input input-bordered flex items-center gap-2">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 16 16"
-          fill="currentColor"
-          className="h-4 w-4 opacity-70"
-        >
-          <path
-            fillRule="evenodd"
-            d="M14 6a4 4 0 0 1-4.899 3.899l-1.955 1.955a.5.5 0 0 1-.353.146H5v1.5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-2.293a.5.5 0 0 1 .146-.353l3.955-3.955A4 4 0 1 1 14 6Zm-4-2a.75.75 0 0 0 0 1.5.5.5 0 0 1 .5.5.75.75 0 0 0 1.5 0 2 2 0 0 0-2-2Z"
-            clipRule="evenodd"
-          />
-        </svg>
-        <input type="password" className="grow" value="password" />
-      </label>
-    </>
+    <div className="bg-purple-100">
+      <div className=" flex justify-center items-center h-[80vh] ">
+        <div className="w-1/4 bg-slate-400 p-3 rounded-lg max-sm:w-full max-sm:mx-7">
+          <h1 className="text-white font-semibold text-2xl">Login</h1>
+
+          <label className="input input-bordered mt-4 flex items-center gap-2">
+            <MdEmail className="text-gray-500" />
+            <input
+              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              value={email}
+              className="grow"
+              placeholder="Email"
+            />
+          </label>
+
+          <label className="input input-bordered mt-4 flex items-center gap-2">
+            <FaKey className="text-gray-500" />
+            <input
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              type={showPassword}
+            />
+            {showPassword === "password" ? (
+              <FaEyeSlash onClick={handleHidePassword} className="ml-20" />
+            ) : (
+              <FaRegEye onClick={handleHidePassword} className="ml-20 " />
+            )}
+          </label>
+          <button
+            onClick={handleLogin}
+            className="w-full bg-blue-500 rounded-lg mt-4 py-3 text-white font-semibold text-xl hover:bg-blue-600"
+          >
+            Login
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 
