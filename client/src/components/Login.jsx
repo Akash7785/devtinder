@@ -6,12 +6,15 @@ import { FaRegEye } from "react-icons/fa";
 import axios from "axios";
 import { BASE_URL } from "../utils/constant";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { addUser } from "../store/features/userSlice";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("akashks838@gmail.com");
+  const [password, setPassword] = useState("Akashks@838");
   const [showPassword, setShowPassword] = useState("password");
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleHidePassword = () => {
     if (showPassword === "password") {
@@ -33,7 +36,7 @@ const Login = () => {
         { withCredentials: true }
       );
       console.log(res);
-      // dispatch(addUser(res.data));
+      dispatch(addUser(res.data));
       return navigate("/");
     } catch (err) {
       // setError(err?.response?.data || "Something went wrong");

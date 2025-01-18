@@ -7,7 +7,8 @@ const bcrypt = require("bcrypt");
 authRouter.post("/signup", async (req, res) => {
   try {
     // validateSignUpData(req);
-    const { firstName, lastName, email, password, age } = req?.body;
+    const { firstName, lastName, email, password, age, photoUrl, skills } =
+      req?.body;
     const user = await User.findOne({ email: email });
     if (user) {
       throw new Error("User already exists");
@@ -23,6 +24,8 @@ authRouter.post("/signup", async (req, res) => {
         email,
         password: hashPassword,
         age,
+        photoUrl,
+        skills,
       });
       await createdUser.save();
     });
@@ -46,8 +49,7 @@ authRouter.post("/login", async (req, res) => {
       const token = await user.getJWT();
       console.log("token", token);
       res.cookie("token", token);
-      res.status(200).send("Login successful");
-      res.json({ msg: "Login successful" });
+      res.status(200).send(user);
     } else {
       throw new Error("Invalid credentials");
     }
