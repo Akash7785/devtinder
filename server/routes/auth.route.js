@@ -27,9 +27,13 @@ authRouter.post("/signup", async (req, res) => {
         photoUrl,
         skills,
       });
-      await createdUser.save();
+      const savedUser = await createdUser.save();
+      res.cookie("token", token, {
+        expires: new Date(Date.now() + 8 * 3600000),
+      });
+
+      res.json({ message: "User Added successfully!", data: savedUser });
     });
-    res.status(200).send("User created successfully");
   } catch (error) {
     res.status(400).send("Can not register user" + error.message);
   }
@@ -48,7 +52,9 @@ authRouter.post("/login", async (req, res) => {
       // CREATING A COOKIE & JWT TOKEN FOR AUTHENTICATION
       const token = await user.getJWT();
       console.log("token", token);
-      res.cookie("token", token);
+      res.cookie("token", token, {
+        expires: new Date(Date.now() + 8 * 3600000),
+      });
       res.status(200).send(user);
     } else {
       throw new Error("Invalid credentials");
