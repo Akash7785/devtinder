@@ -26,7 +26,6 @@ connectionRoute.post("/request/send/:status/:userId", async (req, res) => {
       throw new Error("Connection Request Already Exists!!");
     }
     const findingToUserIdInDB = await userModel.findById({ _id: toUserId });
-    console.log("findingToUserIdInDB", findingToUserIdInDB);
     if (!findingToUserIdInDB) {
       throw new Error("User not found");
     }

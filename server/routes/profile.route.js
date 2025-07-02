@@ -17,14 +17,16 @@ profileRouter.get("/profile/view", async (req, res) => {
 // UPDATE A USER
 profileRouter.patch("/profile/edit", async (req, res) => {
   const userId = req?.user._id;
-  console.log("req.user", req.user);
   const data = req?.body;
   try {
     const ALLOWED_UPDATES = [
       "firstName",
+      "lastName",
       "password",
       "photoUrl",
       "about",
+      "gender",
+      "age",
       "skills",
     ];
     const isUpdateAllowed = Object.keys(data).every((k) =>
@@ -40,9 +42,9 @@ profileRouter.patch("/profile/edit", async (req, res) => {
       new: true,
     });
 
-    res.status(200).send("User updated successfully");
+    res.status(200).send(user);
   } catch (error) {
-    res.status(400).send("can not update " + error.message);
+    res.status(400).send(error.message);
   }
 });
 

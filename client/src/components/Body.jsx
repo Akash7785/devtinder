@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import Header from "./Header";
 import { Outlet, useNavigate } from "react-router-dom";
 import Footer from "./Footer";
@@ -10,19 +10,20 @@ import { addUser } from "../store/features/userSlice";
 const Body = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  // const userData = useSelector((store) => store.user);
-  // console.log("userData", userData);
+  const userData = useSelector((store) => store.user.user);
+
   const fetchUser = async () => {
+    if (userData) return;
     try {
       const res = await axios.get(BASE_URL + "/profile/view", {
         withCredentials: true,
       });
       dispatch(addUser(res.data));
-    } catch (error) {
-      if (error.status === 401) {
+    } catch (err) {
+      if (err.status === 401) {
         navigate("/login");
       }
-      console.error(error.message);
+      console.log("Error fetching user data:", err);
     }
   };
 

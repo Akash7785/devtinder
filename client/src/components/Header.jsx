@@ -1,17 +1,22 @@
 import axios from "axios";
-import React from "react";
 import { BASE_URL } from "../utils/constant";
 import { Link, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { removeUser } from "../store/features/userSlice";
 
 const Header = () => {
   const { user } = useSelector((state) => state.user);
-
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const handleLogOut = () => {
-    axios.post(BASE_URL + "/logout", { withCredentials: true });
-    navigate("/login");
+  const handleLogOut = async () => {
+    try {
+      await axios.post(BASE_URL + "/logout", {}, { withCredentials: true });
+      dispatch(removeUser());
+      navigate("/login");
+    } catch (err) {
+      console.log("Error logging out", err);
+    }
   };
 
   return (
@@ -47,11 +52,17 @@ const Header = () => {
                 <li>
                   <Link to={"/profile"} className="justify-between">
                     Profile
-                    <span className="badge">New</span>
                   </Link>
                 </li>
                 <li>
-                  <a>Settings</a>
+                  <Link to={"/connections"}>Connections</Link>
+                </li>
+
+                <li>
+                  <Link to={"/requests"}>
+                    Requests
+                    <span className="badge bg-blue-500 text-white">2</span>
+                  </Link>
                 </li>
                 <li onClick={handleLogOut}>
                   <Link>Logout</Link>

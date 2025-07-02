@@ -6,18 +6,46 @@ const connectionRequest = require("../model/connection.model");
 
 const USER_SAFE_DATA = "firstName lastName photoUrl age gender about skills";
 
-// GET ALL USERS
+//  USERS FEED
 userRouter.get("/feed", userAuth, async (req, res) => {
   try {
-    // const users = await User.find();
-    // res.status(200).send(users);
-    res.send("hello feed");
+    const loggedInUser = req.user;
+    const page = parseInt(req.query.page) || 1;
+    let limit = parseInt(req.query.limit) || 10;
+    if (limit > 50) {
+      limit = 50;
+    }
+
+    const connectionRequests = await connectionRequest
+      .find({
+        $or: [{ fromUserId: loggedInUser._id }, { toUserId: loggedInUser._id }],
+      })
+      .select("fromUserId toUserId");
+
+    const hideFromUserFeed = new Set();
+
+    connectionRequests.forEach((request) => {
+      hideFromUserFeed.add(request.fromUserId.toString());
+      hideFromUserFeed.add(request.toUserId.toString());
+    });
+
+    const users = await User.find({
+      $and: [
+        { _id: { $nin: Array.from(hideFromUserFeed) } },
+        { _id: { $ne: loggedInUser._id } },
+      ],
+    })
+      .select(USER_SAFE_DATA)
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    res.send(users);
   } catch (error) {
     res.status(400).send("Can not get users" + error.message);
   }
 });
 
-// All RECIEVED REQUESTS
+// Get all the pending connection requests for loggedin user
 userRouter.get("/user/requests/received", userAuth, async (req, res) => {
   try {
     const loggedInUser = req.user;

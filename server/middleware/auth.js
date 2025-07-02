@@ -3,8 +3,11 @@ const User = require("../model/user.model");
 
 const userAuth = async (req, res, next) => {
   try {
-    const { token } = req.cookies;
-    console.log("tokenUserAuth", token);
+    const { token } = req.cookies; // Extract token from cookies
+    // const token  = req.headers.authorization?.split(" ")[1]; // Extract token from Authorization header
+    // const token =req.headers["x-auth-token"]; // Extract token from custom header
+
+    // If token is not present in cookies or headers, return 401 Unauthorized
     if (!token) {
       return res.status(401).send("Please login!");
     }

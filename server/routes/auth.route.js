@@ -24,13 +24,14 @@ authRouter.post("/signup", async (req, res) => {
         email,
         password: hashPassword,
         age,
+        gender,
         photoUrl,
         skills,
       });
       const savedUser = await createdUser.save();
-      res.cookie("token", token, {
-        expires: new Date(Date.now() + 8 * 3600000),
-      });
+      // res.cookie("token", token, {
+      //   expires: new Date(Date.now() + 8 * 3600000),
+      // });
 
       res.json({ message: "User Added successfully!", data: savedUser });
     });
@@ -51,7 +52,6 @@ authRouter.post("/login", async (req, res) => {
     if (isPasswordValid) {
       // CREATING A COOKIE & JWT TOKEN FOR AUTHENTICATION
       const token = await user.getJWT();
-      console.log("token", token);
       res.cookie("token", token, {
         expires: new Date(Date.now() + 8 * 3600000),
       });
@@ -60,7 +60,7 @@ authRouter.post("/login", async (req, res) => {
       throw new Error("Invalid credentials");
     }
   } catch (error) {
-    res.status(400).send("Can not login user " + error.message);
+    res.status(400).send(error.message);
   }
 });
 

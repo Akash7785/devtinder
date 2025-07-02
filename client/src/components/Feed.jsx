@@ -1,15 +1,30 @@
-import React from "react";
+import { useEffect, useState } from "react";
+import { BASE_URL } from "../utils/constant";
+import axios from "axios";
+import UserCard from "./UserCard";
 
 const Feed = () => {
+  const [users, setUsers] = useState([]);
+  const fetchUsers = async () => {
+    try {
+      const res = await axios.get(BASE_URL + "/feed", {
+        withCredentials: true,
+      });
+      console.log("res", res.data);
+      setUsers(res.data);
+    } catch (err) {
+      console.log("Error fetching users for feed:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
   return (
-    <div>
-      <div className="mockup-phone">
-        <div className="camera"></div>
-        <div className="display">
-          <div className="artboard artboard-demo phone-1">Hi.</div>
-        </div>
-      </div>
-    </div>
+    <>
+      <UserCard user={users[1]} />
+    </>
   );
 };
 

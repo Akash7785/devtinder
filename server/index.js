@@ -10,7 +10,7 @@ app.use(express.json());
 app.use(cookieparser());
 app.use(
   cors({
-    origin: "http://localhost:5174",
+    origin: "http://localhost:5173", // Whitelisted URL from where request are allowed
     credentials: true,
   })
 );
