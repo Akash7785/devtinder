@@ -17,6 +17,7 @@ const userSchema = mongoose.Schema(
     email: {
       type: String,
       unique: true,
+      required: true,
       trim: true,
       lowercase: true,
       validate(value) {
@@ -37,12 +38,11 @@ const userSchema = mongoose.Schema(
     age: {
       type: Number,
       min: 18,
-      required: true,
     },
     gender: {
       type: String,
       enum: {
-        values: ["male", "female", "other"],
+        values: ["Male", "Female", "Other", "male", "female", "other"],
         message: `{VALUE} is not a valid gender type.`,
       },
     },
@@ -58,6 +58,7 @@ const userSchema = mongoose.Schema(
     },
     about: {
       type: String,
+      default: "This is a default about of the user!",
     },
     skills: {
       type: [String],

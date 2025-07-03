@@ -2,12 +2,15 @@ const express = require("express");
 const authRouter = express.Router();
 const User = require("../model/user.model");
 const bcrypt = require("bcrypt");
+// const { validateSignUpData } = require("../utils/validation");
 
 // REGISTER A USER
 authRouter.post("/signup", async (req, res) => {
   try {
     // validateSignUpData(req);
+    console.log("line no 11");
     const { firstName, lastName, email, password } = req?.body;
+
     const user = await User.findOne({ email: email });
     if (user) {
       throw new Error("User already exists");
@@ -17,21 +20,23 @@ authRouter.post("/signup", async (req, res) => {
       if (err) {
         throw new Error("Can not hash password");
       }
+      console.log("above user creation");
       const createdUser = new User({
         firstName,
         lastName,
         email,
         password: hashPassword,
       });
+      console.log(createdUser);
       const savedUser = await createdUser.save();
-      // res.cookie("token", token, {
-      //   expires: new Date(Date.now() + 8 * 3600000),
-      // });
+      res.cookie("token", token, {
+        expires: new Date(Date.now() + 8 * 3600000),
+      });
 
       res.json({ message: "User Added successfully!", data: savedUser });
     });
   } catch (error) {
-    res.status(400).send("Can not register user" + error.message);
+    res.status(400).send("ERROR!" + error);
   }
 });
 

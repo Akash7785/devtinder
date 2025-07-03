@@ -6,6 +6,8 @@ import { removeUser } from "../store/features/userSlice";
 
 const Header = () => {
   const { user } = useSelector((state) => state.user);
+  const { request } = useSelector((state) => state.request);
+  // const requestCount = request.length;
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -61,7 +63,9 @@ const Header = () => {
                 <li>
                   <Link to={"/requests"}>
                     Requests
-                    <span className="badge bg-blue-500 text-white">2</span>
+                    <span className="badge bg-blue-500 text-white">
+                      {/* {requestCount} */}
+                    </span>
                   </Link>
                 </li>
                 <li onClick={handleLogOut}>

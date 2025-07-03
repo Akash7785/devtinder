@@ -36,6 +36,7 @@ const EditProfile = ({ user }) => {
         },
         { withCredentials: true }
       );
+      console.log("responsesss", res);
       if (res.status === 200) {
         UpdateToast();
       }
