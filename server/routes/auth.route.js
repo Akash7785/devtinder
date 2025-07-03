@@ -7,8 +7,7 @@ const bcrypt = require("bcrypt");
 authRouter.post("/signup", async (req, res) => {
   try {
     // validateSignUpData(req);
-    const { firstName, lastName, email, password, age, photoUrl, skills } =
-      req?.body;
+    const { firstName, lastName, email, password } = req?.body;
     const user = await User.findOne({ email: email });
     if (user) {
       throw new Error("User already exists");
@@ -23,10 +22,6 @@ authRouter.post("/signup", async (req, res) => {
         lastName,
         email,
         password: hashPassword,
-        age,
-        gender,
-        photoUrl,
-        skills,
       });
       const savedUser = await createdUser.save();
       // res.cookie("token", token, {
