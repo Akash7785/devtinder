@@ -4,7 +4,7 @@ const ProfileView = ({ user }) => {
     <div className=" m-10">
       <div className=" shadow-md w-80  rounded-lg bg-white p-2">
         <img
-          className="rounded-md w-80 object-fill h-96"
+          className="rounded-md w-80 object-cover object-top h-96"
           src={photoUrl}
           alt="profile Pic"
         />

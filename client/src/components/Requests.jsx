@@ -1,40 +1,62 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../utils/constant";
-import { useDispatch } from "react-redux";
-import { addRequestData } from "../store/features/requestSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { addRequestData, removeRequest } from "../store/features/requestSlice";
 
 const Requests = () => {
-  const [requestList, setRequestList] = useState([]);
-
   const dispatch = useDispatch();
-  // const requestList = useSelector((store) => store.request.request);
-  // console.log(requestList);
+  const requests = useSelector((store) => store.request.request);
+  console.log("object", requests);
 
-  const requestRecieved = async () => {
-    const response = await axios.get(BASE_URL + "/user/requests/received", {
-      withCredentials: true,
-    });
-    console.log(response.data.data);
-    setRequestList(response.data.data);
-    dispatch(addRequestData(response.data.data));
+  const fetchRequest = async () => {
+    try {
+      const response = await axios.get(BASE_URL + "/user/requests/received", {
+        withCredentials: true,
+      });
+
+      dispatch(addRequestData(response.data.data));
+    } catch (error) {
+      console.log("Error", error.message);
+    }
+  };
+
+  const reviewRequest = async (status, id) => {
+    try {
+      const res = await axios.post(
+        BASE_URL + "/request/review/" + status + "/" + id,
+        {},
+        { withCredentials: true }
+      );
+      dispatch(removeRequest(id));
+      console.log(res);
+    } catch (error) {
+      console.log("Error", error);
+    }
   };
 
   useEffect(() => {
-    requestRecieved();
+    fetchRequest();
   }, []);
 
-  if (!requestList) return;
+  if (!requests) return;
 
-  if (requestList.length === 0) return <h1>No request found</h1>;
+  if (requests.length === 0)
+    return (
+      <h1 className="text-center text-3xl font-semibold h-screen mt-5">
+        No request found
+      </h1>
+    );
 
   return (
     <>
       <div className="mt-5">
         <h1 className="text-3xl text-center">All Requests</h1>
-        {requestList.map((request) => {
+        {requests.map((request) => {
           const { _id, firstName, lastName, age, gender, about, photoUrl } =
             request.fromUserId;
+          const id = request._id;
+
           return (
             <div>
               <div key={_id} className="flex justify-center flex-wrap gap-5">
@@ -55,10 +77,16 @@ const Requests = () => {
                       {gender} <span> {age}</span>
                     </p>
                     <div className="flex justify-center items-center">
-                      <button className="bg-blue-500 text-white px-4 py-2 rounded-md m-2">
+                      <button
+                        onClick={() => reviewRequest("accepted", id)}
+                        className="bg-blue-500 text-white px-4 py-2 rounded-md m-2"
+                      >
                         Accept
                       </button>
-                      <button className="bg-red-500 text-white px-4 py-2 rounded-md m-2">
+                      <button
+                        onClick={() => reviewRequest("rejected", id)}
+                        className="bg-red-500 text-white px-4 py-2 rounded-md m-2"
+                      >
                         Reject
                       </button>
                     </div>
